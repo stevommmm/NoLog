@@ -1,0 +1,7 @@
+name: NoLog
+main: com.c45y.NoLog.NoLog
+version: 0.1
+permissions:
+    NoLog.view:
+        description: Viewing of PvP logout messages
+        default: op
