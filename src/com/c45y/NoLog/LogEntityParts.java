@@ -22,12 +22,13 @@ public class LogEntityParts extends EntityListener{
 	}
 	
 	public void onEntityDamage(EntityDamageEvent event){
-		if (event.getEntity() instanceof Player) {
-			EntityDamageByEntityEvent damageEvent = (EntityDamageByEntityEvent) event;
-			if (damageEvent.getDamager() instanceof Player) {
-				Player player = (Player) event.getEntity();
-				plugin.PlayerLog.put(player, System.currentTimeMillis());
-			}
+		if (!(event instanceof EntityDamageByEntityEvent)) {
+			return;
+		}
+		EntityDamageByEntityEvent damageEvent = (EntityDamageByEntityEvent) event;
+		if (damageEvent.getDamager() instanceof Player && damageEvent.getEntity() instanceof Player) {
+			Player player = (Player) event.getEntity();
+			plugin.PlayerLog.put(player, System.currentTimeMillis());
 		}	
 	}
 }
