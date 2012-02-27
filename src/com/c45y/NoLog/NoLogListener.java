@@ -18,7 +18,7 @@ public class NoLogListener implements Listener{
 		plugin = instance;
 	}
 	
-	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onEntityDeath(EntityDeathEvent event){
 		if (event instanceof PlayerDeathEvent) {
 			Player player = (Player) event.getEntity();
@@ -26,7 +26,7 @@ public class NoLogListener implements Listener{
 		}
 	}
 	
-	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onEntityDamage(EntityDamageEvent event){
 		if (!(event instanceof EntityDamageByEntityEvent)) {
 			return;
@@ -38,9 +38,10 @@ public class NoLogListener implements Listener{
 		}	
 	}
 	
-	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onPlayerQuit(PlayerQuitEvent event) {
 			Player player = event.getPlayer();
+			if (player.isDead()) { return; }
 			if (plugin.PlayerLog.containsKey(player)) {
 				if ( plugin.PlayerLog.get(player) > System.currentTimeMillis() - 10000) {
 				    for(Player serv_players: plugin.getServer().getOnlinePlayers()) {
