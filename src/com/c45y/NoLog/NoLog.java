@@ -12,13 +12,13 @@ public class NoLog extends JavaPlugin {
 	Logger log = Logger.getLogger("Minecraft");
 	public Map<Player, Long> PlayerLog = new HashMap<Player, Long>();
 
-	public void onEnable(){ 
-		PluginManager pm = this.getServer().getPluginManager();
+	public void onEnable(){
+		PluginManager pm = getServer().getPluginManager();
 		pm.registerEvents(loglistener, this);
 		log.info("NoLog enabled.");
 	}
 
-	public void onDisable(){ 
+	public void onDisable(){
 		log.info("NoLog disabled.");
 	}
 }

@@ -3,7 +3,6 @@ package com.c45y.NoLog;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Tameable;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -12,10 +11,9 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.potion.Potion;
 
 public class NoLogListener implements Listener{
-	public NoLog plugin;
+	public final NoLog plugin;
 
 	public NoLogListener(NoLog instance) {
 		plugin = instance;
@@ -42,25 +40,26 @@ public class NoLogListener implements Listener{
 			Player player = (Player) event.getEntity();
 			plugin.PlayerLog.put(player, System.currentTimeMillis());
 		}
-		if (damageEvent.getDamager() instanceof Arrow) {
-			Arrow arrow = (Arrow) event.getEntity();
+		else if (damageEvent.getDamager() instanceof Arrow) {
+			Arrow arrow = (Arrow) damageEvent.getDamager();
 			if (arrow.getShooter() instanceof Player) {
 				Player player = (Player) event.getEntity();
-				if (player.getUniqueId() != arrow.getShooter().getUniqueId()) {
+				Player shooter = (Player) arrow.getShooter();
+				if (player != shooter) {
 					plugin.PlayerLog.put(player, System.currentTimeMillis());
 				}
 			}
 		}
-		if (damageEvent.getDamager() instanceof Tameable) {
-			Tameable tameable = (Tameable) damageEvent.getEntity();
-			if (tameable.getOwner() != null) {
-				Player tamer = (Player) tameable.getOwner();
+		/*else if (damageEvent.getDamager() instanceof Wolf) {
+			Wolf wolf = (Wolf) damageEvent.getEntity();
+			if (wolf.isTamed() && wolf.getOwner() != null) {
+				Player tamer = (Player) wolf.getOwner();
 				Player player = (Player) event.getEntity();
-				if (tamer.getUniqueId() == player.getUniqueId()) {
+				if (tamer == player) {
 					plugin.PlayerLog.put(player, System.currentTimeMillis());
 				}
 			}
-		}
+		}*/
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
