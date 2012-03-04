@@ -23,7 +23,9 @@ public class NoLogListener implements Listener{
 	public void onEntityDeath(EntityDeathEvent event){
 		if (event instanceof PlayerDeathEvent) {
 			Player player = (Player) event.getEntity();
-			plugin.PlayerLog.remove(player);
+			if (plugin.PlayerLog.containsKey(player)) {
+				plugin.PlayerLog.remove(player);
+			}
 		}
 	}
 
@@ -70,10 +72,10 @@ public class NoLogListener implements Listener{
 			if ( plugin.PlayerLog.get(player) > System.currentTimeMillis() - 10000) {
 				for(Player serv_players: plugin.getServer().getOnlinePlayers()) {
 					if(serv_players.hasPermission("NoLog.view")) {
-						serv_players.sendMessage(ChatColor.DARK_GRAY + player.getDisplayName() + " left shortly after pvp. [" + ((System.currentTimeMillis() - plugin.PlayerLog.get(player)) /1000 ) + "]");
+						serv_players.sendMessage(ChatColor.DARK_GRAY + player.getDisplayName() + " - NoLog infraction, seconds: " + ((System.currentTimeMillis() - plugin.PlayerLog.get(player)) /1000 ));
 					}
 				}
-				plugin.log.info(player.getDisplayName() + " left shortly after pvp. [" + ((System.currentTimeMillis() - plugin.PlayerLog.get(player)) /1000 ) + "]");
+				plugin.log.info(player.getDisplayName() + " - NoLog infraction, seconds: " + ((System.currentTimeMillis() - plugin.PlayerLog.get(player)) /1000 ));
 			}
 			plugin.PlayerLog.remove(player);
 		}
