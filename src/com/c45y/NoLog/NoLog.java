@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 public class NoLog extends JavaPlugin {
 	private final NoLogListener loglistener = new NoLogListener(this);
 	Logger log = Logger.getLogger("Minecraft");
-	public Map<Player, Long> PlayerLog = new HashMap<Player, Long>();
+	public Map<Player, NoLogObject> PlayerLog = new HashMap<Player, NoLogObject>();
 
 	public void onEnable(){
 		PluginManager pm = getServer().getPluginManager();

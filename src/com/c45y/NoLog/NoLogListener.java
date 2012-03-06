@@ -28,7 +28,9 @@ public class NoLogListener implements Listener{
 			}
 		}
 	}
-
+	
+	//InventoryOpenEvent
+	
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onEntityDamage(EntityDamageEvent event){
 		if (!(event instanceof EntityDamageByEntityEvent)) {
@@ -39,8 +41,19 @@ public class NoLogListener implements Listener{
 			return;
 		}
 		if (damageEvent.getDamager() instanceof Player) {
+			Player attacker = (Player) damageEvent.getDamager();
+			// Are we being attacked by an invulnerable player? 200 standard 10 seconds?
+			if (damageEvent.getDamager().getTicksLived() < 60) {
+				for(Player serv_players: plugin.getServer().getOnlinePlayers()) {
+					if(serv_players.hasPermission("NoLog.view")) {
+						serv_players.sendMessage(ChatColor.DARK_RED + attacker.getDisplayName() + " attacked while invulnerable!");
+					}
+				}
+				plugin.log.info("NoLog: " + attacker.getDisplayName() + " attacked while invulnerable!");
+			}
 			Player player = (Player) event.getEntity();
-			plugin.PlayerLog.put(player, System.currentTimeMillis());
+			NoLogObject nlo = new NoLogObject((Player)damageEvent.getDamager(),System.currentTimeMillis(),player.getLocation());
+			plugin.PlayerLog.put(player, nlo);
 		}
 		else if (damageEvent.getDamager() instanceof Arrow) {
 			Arrow arrow = (Arrow) damageEvent.getDamager();
@@ -48,7 +61,8 @@ public class NoLogListener implements Listener{
 				Player player = (Player) event.getEntity();
 				Player shooter = (Player) arrow.getShooter();
 				if (player != shooter) {
-					plugin.PlayerLog.put(player, System.currentTimeMillis());
+					NoLogObject nlo = new NoLogObject(shooter,System.currentTimeMillis(),player.getLocation());
+					plugin.PlayerLog.put(player, nlo);
 				}
 			}
 		}
@@ -69,15 +83,22 @@ public class NoLogListener implements Listener{
 		Player player = event.getPlayer();
 		if (player.isDead()) { return; }
 		if (plugin.PlayerLog.containsKey(player)) {
-			if ( plugin.PlayerLog.get(player) > System.currentTimeMillis() - 10000) {
+			if ( plugin.PlayerLog.get(player).getTimestamp() > System.currentTimeMillis() - 10000) {
 				for(Player serv_players: plugin.getServer().getOnlinePlayers()) {
 					if(serv_players.hasPermission("NoLog.view")) {
-						serv_players.sendMessage(ChatColor.DARK_GRAY + player.getDisplayName() + " - NoLog infraction, seconds: " + ((System.currentTimeMillis() - plugin.PlayerLog.get(player)) /1000 ));
+						serv_players.sendMessage(ChatColor.DARK_GRAY + "NL " + genNoLogMessage(player));
 					}
 				}
-				plugin.log.info(player.getDisplayName() + " - NoLog infraction, seconds: " + ((System.currentTimeMillis() - plugin.PlayerLog.get(player)) /1000 ));
+				plugin.log.info("NoLog: " + genNoLogMessage(player));
 			}
 			plugin.PlayerLog.remove(player);
 		}
+	}
+	
+	// Generate the resulting string here to keep it all neat and easy to change.
+	// Possibly add a config to turn off parts of the message. i.e. location
+	public String genNoLogMessage(Player player) {
+		NoLogObject nlo = plugin.PlayerLog.get(player);
+		return "[" + player.getDisplayName() + "] < [" + nlo.getAttackerName() + "] seconds: " + ((System.currentTimeMillis() - nlo.getTimestamp()) /1000 ) + " ,distance: " + nlo.getDistance(player);
 	}
 }
