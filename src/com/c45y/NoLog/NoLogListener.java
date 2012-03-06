@@ -42,16 +42,16 @@ public class NoLogListener implements Listener{
 		}
 		if (damageEvent.getDamager() instanceof Player) {
 			Player attacker = (Player) damageEvent.getDamager();
-			// Are we being attacked by an invulnerable player? 200 standard 10 seconds?
+			Player player = (Player) event.getEntity();
+			// Are we being attacked by an invulnerable player? 20 ticks == 1 second
 			if (damageEvent.getDamager().getTicksLived() < 60) {
 				for(Player serv_players: plugin.getServer().getOnlinePlayers()) {
 					if(serv_players.hasPermission("NoLog.view")) {
-						serv_players.sendMessage(ChatColor.DARK_RED + attacker.getDisplayName() + " attacked while invulnerable!");
+						serv_players.sendMessage(ChatColor.BLUE + "NL: " + attacker.getDisplayName() + " attacked " + player.getDisplayName() + " while invulnerable!");
 					}
 				}
-				plugin.log.info("NoLog: " + attacker.getDisplayName() + " attacked while invulnerable!");
+				plugin.log.info("NoLog: " + attacker.getDisplayName() + " attacked " + player.getDisplayName() + " while invulnerable!");
 			}
-			Player player = (Player) event.getEntity();
 			NoLogObject nlo = new NoLogObject((Player)damageEvent.getDamager(),System.currentTimeMillis(),player.getLocation());
 			plugin.PlayerLog.put(player, nlo);
 		}
@@ -84,11 +84,11 @@ public class NoLogListener implements Listener{
 		if (player.isDead()) { return; }
 		if (plugin.PlayerLog.containsKey(player)) {
 			if ( plugin.PlayerLog.get(player).getTimestamp() > System.currentTimeMillis() - 10000) {
-				for(Player serv_players: plugin.getServer().getOnlinePlayers()) {
-					if(serv_players.hasPermission("NoLog.view")) {
-						serv_players.sendMessage(ChatColor.DARK_GRAY + "NL " + genNoLogMessage(player));
-					}
-				}
+		        for (Player playeri : plugin.getServer().getOnlinePlayers()) {
+		            if (playeri.hasPermission("NoLog.view")) {
+		            	playeri.sendMessage(ChatColor.BLUE + "NL: " + genNoLogMessage(player));
+		            }
+		        }
 				plugin.log.info("NoLog: " + genNoLogMessage(player));
 			}
 			plugin.PlayerLog.remove(player);
@@ -99,6 +99,6 @@ public class NoLogListener implements Listener{
 	// Possibly add a config to turn off parts of the message. i.e. location
 	public String genNoLogMessage(Player player) {
 		NoLogObject nlo = plugin.PlayerLog.get(player);
-		return "[" + player.getDisplayName() + "] < [" + nlo.getAttackerName() + "] seconds: " + ((System.currentTimeMillis() - nlo.getTimestamp()) /1000 ) + " ,distance: " + nlo.getDistance(player);
+		return "" + player.getDisplayName() + " logged on " + nlo.getAttackerName() + ", seconds: " + ((System.currentTimeMillis() - nlo.getTimestamp()) /1000 ) + " ,distance: " + nlo.getDistance(player);
 	}
 }
