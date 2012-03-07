@@ -28,9 +28,9 @@ public class NoLogListener implements Listener{
 			}
 		}
 	}
-	
+
 	//InventoryOpenEvent
-	
+
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onEntityDamage(EntityDamageEvent event){
 		if (!(event instanceof EntityDamageByEntityEvent)) {
@@ -83,18 +83,19 @@ public class NoLogListener implements Listener{
 		Player player = event.getPlayer();
 		if (player.isDead()) { return; }
 		if (plugin.PlayerLog.containsKey(player)) {
-			if ( plugin.PlayerLog.get(player).getTimestamp() > System.currentTimeMillis() - 10000) {
-		        for (Player playeri : plugin.getServer().getOnlinePlayers()) {
-		            if (playeri.hasPermission("NoLog.view")) {
-		            	playeri.sendMessage(ChatColor.BLUE + "NL: " + genNoLogMessage(player));
-		            }
-		        }
+			// Check if the attacker is dead, we don't care if you log after killing someone
+			if ((!plugin.PlayerLog.get(player).getAttacker().isDead()) && (plugin.PlayerLog.get(player).getTimestamp() > System.currentTimeMillis() - 10000)) {
+				for (Player playeri : plugin.getServer().getOnlinePlayers()) {
+					if (playeri.hasPermission("NoLog.view")) {
+						playeri.sendMessage(ChatColor.BLUE + "NL: " + genNoLogMessage(player));
+					}
+				}
 				plugin.log.info("NoLog: " + genNoLogMessage(player));
 			}
 			plugin.PlayerLog.remove(player);
 		}
 	}
-	
+
 	// Generate the resulting string here to keep it all neat and easy to change.
 	// Possibly add a config to turn off parts of the message. i.e. location
 	public String genNoLogMessage(Player player) {
