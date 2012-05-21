@@ -10,6 +10,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 public class NoLogListener implements Listener{
@@ -28,9 +29,7 @@ public class NoLogListener implements Listener{
 			}
 		}
 	}
-	
-	//InventoryOpenEvent
-	
+
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onEntityDamage(EntityDamageEvent event){
 		if (!(event instanceof EntityDamageByEntityEvent)) {
@@ -41,17 +40,7 @@ public class NoLogListener implements Listener{
 			return;
 		}
 		if (damageEvent.getDamager() instanceof Player) {
-			Player attacker = (Player) damageEvent.getDamager();
 			Player player = (Player) event.getEntity();
-			// Are we being attacked by an invulnerable player? 20 ticks == 1 second
-			if (damageEvent.getDamager().getTicksLived() < 60) {
-				for(Player serv_players: plugin.getServer().getOnlinePlayers()) {
-					if(serv_players.hasPermission("NoLog.view")) {
-						serv_players.sendMessage(ChatColor.BLUE + "NL: " + attacker.getDisplayName() + " attacked " + player.getDisplayName() + " while invulnerable!");
-					}
-				}
-				plugin.log.info("NoLog: " + attacker.getDisplayName() + " attacked " + player.getDisplayName() + " while invulnerable!");
-			}
 			NoLogObject nlo = new NoLogObject((Player)damageEvent.getDamager(),System.currentTimeMillis(),player.getLocation());
 			plugin.PlayerLog.put(player, nlo);
 		}
@@ -66,35 +55,36 @@ public class NoLogListener implements Listener{
 				}
 			}
 		}
-		/*else if (damageEvent.getDamager() instanceof Wolf) {
-			Wolf wolf = (Wolf) damageEvent.getEntity();
-			if (wolf.isTamed() && wolf.getOwner() != null) {
-				Player tamer = (Player) wolf.getOwner();
-				Player player = (Player) event.getEntity();
-				if (tamer == player) {
-					plugin.PlayerLog.put(player, System.currentTimeMillis());
-				}
+	}
+
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void onInventoryClick(InventoryClickEvent event){
+		if (event.getWhoClicked() instanceof Player) {
+			Player player = (Player) event.getWhoClicked();
+			if (player.isSprinting()) {
+				player.kickPlayer("Inventory Tweaks is not allowed on this server.");
+				plugin.messageMods(ChatColor.BLUE + "NL: " + player.getName() + " is using invtweaks");
+				plugin.log.info("*NL: " + player.getName() + " is using invtweaks");
 			}
-		}*/
+		}
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onPlayerQuit(PlayerQuitEvent event) {
 		Player player = event.getPlayer();
 		if (player.isDead()) { return; }
+		if (player.getFallDistance() > 4F ) {
+			System.out.println("*NL: " + player.getName() + " tried to avoid '" + player.getFallDistance() + "' fall damage.");
+		}
 		if (plugin.PlayerLog.containsKey(player)) {
 			if ( plugin.PlayerLog.get(player).getTimestamp() > System.currentTimeMillis() - 10000) {
-		        for (Player playeri : plugin.getServer().getOnlinePlayers()) {
-		            if (playeri.hasPermission("NoLog.view")) {
-		            	playeri.sendMessage(ChatColor.BLUE + "NL: " + genNoLogMessage(player));
-		            }
-		        }
+				plugin.messageMods(ChatColor.BLUE + "NL: " + genNoLogMessage(player));
 				plugin.log.info("NoLog: " + genNoLogMessage(player));
 			}
 			plugin.PlayerLog.remove(player);
 		}
 	}
-	
+
 	// Generate the resulting string here to keep it all neat and easy to change.
 	// Possibly add a config to turn off parts of the message. i.e. location
 	public String genNoLogMessage(Player player) {
