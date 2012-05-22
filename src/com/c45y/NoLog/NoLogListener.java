@@ -11,6 +11,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 public class NoLogListener implements Listener{
@@ -61,7 +62,14 @@ public class NoLogListener implements Listener{
 	public void onInventoryClick(InventoryClickEvent event){
 		if (event.getWhoClicked() instanceof Player) {
 			Player player = (Player) event.getWhoClicked();
+			if (player.getOpenInventory().getType() == InventoryType.CHEST) {
+				return;
+			}
+			if (player.getOpenInventory().getType() == InventoryType.CREATIVE) {
+				return;
+			}
 			if (player.isSprinting()) {
+				event.setCancelled(true);
 				player.kickPlayer("Inventory Tweaks is not allowed on this server.");
 				plugin.messageMods(ChatColor.BLUE + "NL: " + player.getName() + " is using invtweaks");
 				plugin.log.info("*NL: " + player.getName() + " is using invtweaks");
