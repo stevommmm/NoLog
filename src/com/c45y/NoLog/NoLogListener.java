@@ -72,11 +72,11 @@ public class NoLogListener implements Listener{
 				event.setCancelled(true);
 				Integer count = plugin.InvLog.get(player.getName());
 				if (count == null) { 
-					count = 1;
+					count = 0;
 				}
 				plugin.InvLog.put(player.getName(), count++);
-				if (count >= 10) {
-					player.kickPlayer("Inventory Tweaks is not allowed on this server.");
+				if (count % 10 == 0) {
+					//player.kickPlayer("Inventory Tweaks is not allowed on this server.");
 					plugin.messageMods(ChatColor.BLUE + "NL: " + player.getName() + " is using invtweaks, level " + count);
 					plugin.log.info("*NL: " + player.getName() + " is using invtweaks, level " + count);
 				}
