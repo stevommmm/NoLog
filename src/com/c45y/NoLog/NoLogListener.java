@@ -93,14 +93,12 @@ public class NoLogListener implements Listener{
 		}
 		if (plugin.PlayerLog.containsKey(player)) {
 			// Check if the attacker is dead, we don't care if you log after killing someone
-			if ((!plugin.PlayerLog.get(player).getAttacker().isDead()) && (plugin.PlayerLog.get(player).getTimestamp() > System.currentTimeMillis() - 10000)) {
-				for (Player playeri : plugin.getServer().getOnlinePlayers()) {
-					if (playeri.hasPermission("NoLog.view")) {
-						playeri.sendMessage(ChatColor.BLUE + "NL: " + genNoLogMessage(player));
-					}
-				}
-				plugin.PlayerLog.remove(player);
+			NoLogObject nlo = plugin.PlayerLog.get(player);
+			if ((!nlo.getAttacker().isDead()) && (nlo.getTimestamp() > System.currentTimeMillis() - 10000) && (nlo.getDistance(nlo.getAttacker()) < 50)) {
+				plugin.messageMods(ChatColor.BLUE + "NL: " + genNoLogMessage(player));
+				plugin.log.info("NoLog: " + genNoLogMessage(player));
 			}
+			plugin.PlayerLog.remove(player);
 		}
 	}
 
