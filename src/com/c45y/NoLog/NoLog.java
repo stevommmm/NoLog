@@ -21,6 +21,7 @@ public class NoLog extends JavaPlugin {
 		getConfig().options().copyDefaults(true);
 		getConfig().addDefault("should.chicken", false);
 		chicken = this.getConfig().getBoolean("should.chicken");
+		saveConfig();
 		log.info("NoLog enabled.");
 	}
 
