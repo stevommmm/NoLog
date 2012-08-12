@@ -1,7 +1,9 @@
 package com.c45y.NoLog;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.entity.Arrow;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -10,8 +12,6 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 public class NoLogListener implements Listener{
@@ -59,35 +59,9 @@ public class NoLogListener implements Listener{
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-	public void onInventoryClick(InventoryClickEvent event){
-		if (event.getWhoClicked() instanceof Player) {
-			Player player = (Player) event.getWhoClicked();
-			if (player.getOpenInventory().getType() == InventoryType.CHEST) {
-				return;
-			}
-			if (player.getOpenInventory().getType() == InventoryType.CREATIVE) {
-				return;
-			}
-			if (player.isSprinting()) {
-				event.setCancelled(true);
-				Integer count = plugin.InvLog.get(player.getName());
-				if (count == null) { 
-					count = 0;
-				}
-				plugin.InvLog.put(player.getName(), count++);
-				if (count % 10 == 0) {
-					//player.kickPlayer("Inventory Tweaks is not allowed on this server.");
-					plugin.messageMods(ChatColor.BLUE + "NL: " + player.getName() + " is using invtweaks, level " + count);
-					plugin.log.info("*NL: " + player.getName() + " is using invtweaks, level " + count);
-				}
-			}
-		}
-	}
-
-	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onPlayerQuit(PlayerQuitEvent event) {
 		Player player = event.getPlayer();
-		if (player.isDead()) { return; }
+//		if (player.isDead()) { return; }
 		if (player.getFallDistance() > 4F ) {
 			System.out.println("*NL: " + player.getName() + " tried to avoid '" + player.getFallDistance() + "' fall damage.");
 		}
@@ -100,6 +74,11 @@ public class NoLogListener implements Listener{
 			}
 			plugin.PlayerLog.remove(player);
 		}
+		if (plugin.chicken) {
+			Location loc = player.getLocation();
+        	loc.getWorld().spawnEntity(loc, EntityType.CHICKEN);
+		}
+
 	}
 
 	// Generate the resulting string here to keep it all neat and easy to change.
