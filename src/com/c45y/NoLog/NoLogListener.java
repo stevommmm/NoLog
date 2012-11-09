@@ -19,7 +19,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
-public class NoLogListener implements Listener{
+public class NoLogListener implements Listener {
 	public final NoLog plugin;
 
 	public NoLogListener(NoLog instance) {
@@ -27,7 +27,7 @@ public class NoLogListener implements Listener{
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-	public void onEntityDeath(EntityDeathEvent event){
+	public void onEntityDeath(EntityDeathEvent event) {
 		if (event instanceof PlayerDeathEvent) {
 			Player player = (Player) event.getEntity();
 			if (plugin.PlayerLog.containsKey(player)) {
@@ -37,7 +37,7 @@ public class NoLogListener implements Listener{
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-	public void onEntityDamage(EntityDamageEvent event){
+	public void onEntityDamage(EntityDamageEvent event) {
 		if (!(event instanceof EntityDamageByEntityEvent)) {
 			return;
 		}
@@ -47,16 +47,18 @@ public class NoLogListener implements Listener{
 		}
 		if (damageEvent.getDamager() instanceof Player) {
 			Player player = (Player) event.getEntity();
-			NoLogObject nlo = new NoLogObject((Player)damageEvent.getDamager(),System.currentTimeMillis(),player.getLocation());
+			NoLogObject nlo = new NoLogObject(
+					(Player) damageEvent.getDamager(),
+					System.currentTimeMillis(), player.getLocation());
 			plugin.PlayerLog.put(player, nlo);
-		}
-		else if (damageEvent.getDamager() instanceof Projectile) {
+		} else if (damageEvent.getDamager() instanceof Projectile) {
 			Projectile projectile = (Projectile) damageEvent.getDamager();
 			if (projectile.getShooter() instanceof Player) {
 				Player player = (Player) event.getEntity();
 				Player shooter = (Player) projectile.getShooter();
 				if (player != shooter) {
-					NoLogObject nlo = new NoLogObject(shooter, System.currentTimeMillis() ,player.getLocation());
+					NoLogObject nlo = new NoLogObject(shooter,
+							System.currentTimeMillis(), player.getLocation());
 					plugin.PlayerLog.put(player, nlo);
 				}
 			}
@@ -66,14 +68,15 @@ public class NoLogListener implements Listener{
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onPlayerQuit(PlayerQuitEvent event) {
 		Player player = event.getPlayer();
-		if (player.getFallDistance() > 4F ) {
-			System.out.println("*NL: " + player.getName() + " tried to avoid '" + player.getFallDistance() + "' fall damage.");
+		if (player.getFallDistance() > 4F) {
+			System.out.println("*NL: " + player.getName() + " tried to avoid '"
+					+ player.getFallDistance() + "' fall damage.");
 		}
 		if (plugin.PlayerLog.containsKey(player)) {
-			if (!containsPlayer(player.getNearbyEntities(4, 4, 4))) { 
+			if (!containsPlayer(player.getNearbyEntities(4, 4, 4))) {
 				return; // Check we actually have players close by
 			}
-			if (isInventoryEmpty(player.getInventory())) { 
+			if (isInventoryEmpty(player.getInventory())) {
 				return; // Do we really care if they have nothing anyway?
 			}
 			NoLogObject nlo = plugin.PlayerLog.get(player);
@@ -90,25 +93,26 @@ public class NoLogListener implements Listener{
 			if (nlo.getDistance(nlo.getAttacker()) < 50) {
 				return; // They are a large distance from the attacker
 			}
-			plugin.messageMods(ChatColor.BLUE + "NL: " + genNoLogMessage(player));
+			plugin.messageMods(ChatColor.BLUE + "NL: "
+					+ genNoLogMessage(player));
 			plugin.log.info("NoLog: " + genNoLogMessage(player));
 			if (plugin.chicken) {
 				event.setQuitMessage(event.getPlayer() + " chickened out");
 				Location loc = player.getLocation();
-	        	loc.getWorld().spawnEntity(loc, EntityType.CHICKEN);
+				loc.getWorld().spawnEntity(loc, EntityType.CHICKEN);
 			}
 		}
 	}
-	
+
 	private boolean containsPlayer(List<Entity> entityList) {
-		for( Entity e : entityList) {
-			if(e.getClass().isInstance(Player.class)) {
+		for (Entity e : entityList) {
+			if (e.getClass().isInstance(Player.class)) {
 				return true;
 			}
 		}
 		return false;
 	}
-	
+
 	private boolean isInventoryEmpty(PlayerInventory pli) {
 		for (final ItemStack is : pli.getArmorContents()) {
 			if (is != null) {
@@ -123,10 +127,14 @@ public class NoLogListener implements Listener{
 		return true;
 	}
 
-	// Generate the resulting string here to keep it all neat and easy to change.
+	// Generate the resulting string here to keep it all neat and easy to
+	// change.
 	// Possibly add a config to turn off parts of the message. i.e. location
 	public String genNoLogMessage(Player player) {
 		NoLogObject nlo = plugin.PlayerLog.get(player);
-		return "" + player.getDisplayName() + " logged on " + nlo.getAttackerName() + ", seconds: " + ((System.currentTimeMillis() - nlo.getTimestamp()) /1000 ) + " ,distance: " + nlo.getDistance(player);
+		return "" + player.getDisplayName() + " logged on "
+				+ nlo.getAttackerName() + ", seconds: "
+				+ ((System.currentTimeMillis() - nlo.getTimestamp()) / 1000)
+				+ " ,distance: " + nlo.getDistance(player);
 	}
 }

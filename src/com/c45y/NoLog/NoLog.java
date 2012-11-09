@@ -15,7 +15,7 @@ public class NoLog extends JavaPlugin {
 	public Map<String, Integer> InvLog = new HashMap<String, Integer>();
 	public boolean chicken;
 
-	public void onEnable(){
+	public void onEnable() {
 		PluginManager pm = getServer().getPluginManager();
 		pm.registerEvents(loglistener, this);
 		getConfig().options().copyDefaults(true);
@@ -25,10 +25,10 @@ public class NoLog extends JavaPlugin {
 		log.info("NoLog enabled.");
 	}
 
-	public void onDisable(){
+	public void onDisable() {
 		log.info("NoLog disabled.");
 	}
-	
+
 	public void messageMods(String str) {
 		for (Player playeri : getServer().getOnlinePlayers()) {
 			if (playeri.hasPermission("NoLog.view")) {
