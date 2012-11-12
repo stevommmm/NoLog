@@ -71,35 +71,29 @@ public class NoLogListener implements Listener {
 		}
 		if (plugin.PlayerLog.containsKey(player)) {
 			if (!containsPlayer(player.getNearbyEntities(10, 10, 10))) {
-				System.out.println("Player not nearby");
 				return; // Check we actually have players close by
 			}
 			if (isInventoryEmpty(player.getInventory())) {
-				System.out.println("Player inv empty");
 				return; // Do we really care if they have nothing anyway?
 			}
 			NoLogObject nlo = plugin.PlayerLog.get(player);
 			plugin.PlayerLog.remove(player);
 			if (player.getTicksLived() < 200) {
-				System.out.println("Player too young");
 				return; // Player is not a suitable age
 			}
 			if (nlo.getAttacker().getTicksLived() < 200) {
-				System.out.println("Attacker too young");
 				return; // Attacker is not a suitable age
 			}
 			if (nlo.getTimestamp() < (System.currentTimeMillis() - 10000)) {
-				System.out.println("PVP was more than 10 seconds ago");
 				return; // PVP was more than 10 seconds ago
 			}
 			if (nlo.getDistance(nlo.getAttacker()) > 50) {
-				System.out.println("They are a large distance from the attacker");
 				return; // They are a large distance from the attacker
 			}
 			plugin.messageMods(ChatColor.BLUE + "NL: " + genNoLogMessage(player, nlo));
 			plugin.log.info("NoLog: " + genNoLogMessage(player, nlo));
 			if (plugin.chicken) {
-				event.setQuitMessage(event.getPlayer().getName() + " chickened out");
+				event.setQuitMessage(player.getName() + " chickened out");
 				Location loc = player.getLocation();
 				loc.getWorld().spawnEntity(loc, EntityType.CHICKEN);
 			}
