@@ -99,7 +99,7 @@ public class NoLogListener implements Listener {
 			plugin.messageMods(ChatColor.BLUE + "NL: " + genNoLogMessage(player, nlo));
 			plugin.log.info("NoLog: " + genNoLogMessage(player, nlo));
 			if (plugin.chicken) {
-				event.setQuitMessage(event.getPlayer() + " chickened out");
+				event.setQuitMessage(event.getPlayer().getName() + " chickened out");
 				Location loc = player.getLocation();
 				loc.getWorld().spawnEntity(loc, EntityType.CHICKEN);
 			}
